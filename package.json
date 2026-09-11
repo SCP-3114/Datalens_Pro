@@ -1,0 +1,12 @@
+{
+  "name": "datalens-pro",
+  "version": "2.1.0",
+  "private": true,
+  "description": "A local-first browser data analysis and visualization workbench",
+  "scripts": {
+    "dev": "npx serve .",
+    "preview": "npx serve ."
+  },
+  "keywords": ["data-analysis", "visualization", "csv", "xlsx", "echarts"],
+  "license": "MIT"
+}
