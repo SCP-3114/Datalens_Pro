@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DataLens Pro — 纯前端数据分析与可视化报表工作台：数据画像、清洗、透视、图表与一键报告">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:title" content="DataLens Pro · 数据分析报表工作台">
+  <meta property="og:description" content="在浏览器本地完成数据接入、分析、可视化、清洗与报告导出。">`r`n<script>
+    // 防闪烁：在首次绘制前应用已保存的主题
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('datalens.settings') || '{}');
+        var pref = s.theme || 'system';
+        var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+        var t = pref === 'system' ? (dark ? 'dark' : 'light') : pref;
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-theme-pref', pref);
+      } catch (e) { }
+    })();
+  </script>
+  <title>DataLens Pro · 数据分析报表工作台</title>
+  
+      
+  
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <!-- ===================== 图标精灵 ===================== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></symbol>
+      <symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/></symbol>
+      <symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24"><path d="M12 20v-10"/><path d="M18 20V4"/><path d="M6 20v-4"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
+      <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/><path d="M19 3v4"/><path d="M17 5h4"/></symbol>
+      <symbol id="i-report" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+      <symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5Z"/></symbol>
+      <symbol id="i-sort" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></symbol>
+      <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+      <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+      <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="i-chev-u" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+      <symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+      <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"/><path d="M3 3v5h5"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/></symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+      <symbol id="i-shrink" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+      <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M9.9 9.9a3 3 0 1 0 4.2 4.2"/><path d="M10.7 5.1A10.4 10.4 0 0 1 12 5c7 0 10 7 10 7a13.2 13.2 0 0 1-1.7 2.7"/><path d="M6.6 6.6A13.5 13.5 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="m2 2 20 20"/></symbol>
+      <symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></symbol>
+      <symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></symbol>
+      <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+      <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+      <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M7 16h10"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+      <symbol id="i-command" viewBox="0 0 24 24"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></symbol>
+      <symbol id="i-wand" viewBox="0 0 24 24"><path d="m3 21 9-9"/><path d="M15 4V2"/><path d="M15 10V8"/><path d="M12.5 5.5 11 4"/><path d="M19 5.5 17.5 7"/><path d="M18 13h2"/><path d="M8 4h2"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></symbol>
+      <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.8 9.8 0 0 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.8 9.8 0 0 1-6.7-2.7L3 16"/><path d="M8 16H3v5"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+      <symbol id="i-fx" viewBox="0 0 24 24"><path d="M18 7V4H6l6 8-6 8h12v-3"/></symbol>
+      <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9"/><path d="m14.5 14.5 5.5 5.5"/><path d="m8.1 8.1 3.9 3.9"/></symbol>
+      <symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+      <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+      <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+      <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.8 9.8 0 0 0-6.7 2.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+      <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+      <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
+      <symbol id="i-paste" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+      <symbol id="i-braces" viewBox="0 0 24 24"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/></symbol>
+      <symbol id="i-rows" viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></symbol>
+      <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4.3-4.3a2.4 2.4 0 0 1 0-3.4l9.6-9.6a2.4 2.4 0 0 1 3.4 0l5.6 5.6a2.4 2.4 0 0 1 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+      <symbol id="i-hist" viewBox="0 0 24 24"><path d="M4 20v-9"/><path d="M9 20V4"/><path d="M14 20v-7"/><path d="M19 20V8"/><path d="M2 20h20"/></symbol>
+      <symbol id="i-pie" viewBox="0 0 24 24"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></symbol>
+      <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="skip-link" href="#mainContent">跳到主要内容</a>
+
+  <div id="topProgress" role="progressbar" aria-label="处理进度"></div>
+
+  <!-- ===================== 顶栏 ===================== -->
+  <header class="topbar">
+    <button id="navToggle" class="btn btn-ghost btn-icon" aria-label="展开导航" style="display:none">
+      <svg class="ic"><use href="#i-menu" /></svg>
+    </button>
+    <div class="brand">
+      <div class="brand-logo"><svg class="ic ic-lg"><use href="#i-gauge" /></svg></div>
+      <div style="min-width:0">
+        <div class="brand-name">Data<span>Lens</span> Pro</div>
+        <div class="brand-sub">本地数据分析 · 可视化 · 报表工作台</div>
+      </div>
+    </div>
+
+    <div id="topFileInfo" class="topbar-file hidden" title="当前数据源">
+      <svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-file" /></svg>
+      <span id="topFileName" class="tiny b truncate" style="max-width:150px">—</span>
+      <span id="topFileMeta" class="tiny dim tf-extra">—</span>
+    </div>
+
+    <div class="grow"></div>
+
+    <button id="btnPalette" class="btn btn-ghost btn-sm" data-tip="命令面板  Ctrl/⌘ + K">
+      <svg class="ic ic-sm"><use href="#i-command" /></svg>
+      <span class="hide-sm">命令</span>
+      <span class="kbd">Ctrl K</span>
+    </button>
+    <button id="langToggle" class="btn btn-ghost btn-sm lang-toggle" type="button" aria-label="切换到 English" data-tip="切换中文 / English">
+      <span class="lang-cn">中</span><span class="lang-divider">/</span><span class="lang-en">EN</span>
+    </button>
+    <button id="btnDemo" class="btn btn-sm" data-tip="载入内置示例销售数据，快速体验全部功能">
+      <svg class="ic ic-sm"><use href="#i-zap" /></svg><span>示例数据</span>
+    </button>
+    <button id="btnOpen" class="btn btn-primary btn-sm" data-tip="支持 CSV / TSV / XLSX / XLS / JSON">
+      <svg class="ic ic-sm"><use href="#i-upload" /></svg><span>导入数据</span>
+    </button>
+    <div style="width:1px;height:24px;background:var(--border);margin:0 2px" class="hide-sm"></div>
+    <button id="btnHelp" class="btn btn-ghost btn-icon btn-sm" aria-label="帮助与快捷键" data-tip="帮助与快捷键  ?">
+      <svg class="ic ic-sm"><use href="#i-help" /></svg>
+    </button>
+    <button id="btnSettings" class="btn btn-ghost btn-icon btn-sm" aria-label="设置" data-tip="偏好设置">
+      <svg class="ic ic-sm"><use href="#i-sliders" /></svg>
+    </button>
+    <button id="btnTheme" class="btn btn-ghost btn-icon btn-sm" aria-label="切换主题" data-tip="切换浅色 / 深色主题">
+      <svg class="ic ic-sm" id="themeIcon"><use href="#i-moon" /></svg>
+    </button>
+  </header>
+
+  <div class="shell">
+    <!-- ===================== 侧边导航 ===================== -->
+    <aside class="sidebar" id="sidebar" aria-label="功能导航">
+      <div class="nav-group">
+        <div class="nav-title">开始</div>
+        <button class="nav-item" data-view="ingest"><svg class="ic"><use href="#i-upload" /></svg>数据接入</button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-title">分析</div>
+        <button class="nav-item needs-data" data-view="overview" disabled><svg class="ic"><use href="#i-gauge" /></svg>数据概览<span class="badge-n" id="navColCount">0</span></button>
+        <button class="nav-item needs-data" data-view="table" disabled><svg class="ic"><use href="#i-table" /></svg>数据表<span class="badge-n" id="navRowCount">0</span></button>
+        <button class="nav-item needs-data" data-view="charts" disabled><svg class="ic"><use href="#i-chart" /></svg>可视化</button>
+        <button class="nav-item needs-data" data-view="pivot" disabled><svg class="ic"><use href="#i-grid" /></svg>透视分析</button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-title">加工</div>
+        <button class="nav-item needs-data" data-view="clean" disabled><svg class="ic"><use href="#i-sparkles" /></svg>数据清洗<span class="badge-n" id="navHistCount">0</span></button>
+        <button class="nav-item needs-data" data-view="report" disabled><svg class="ic"><use href="#i-report" /></svg>报告导出</button>
+      </div>
+
+      <div class="side-card" id="sideSource">
+        <div class="row between gap-2" style="margin-bottom:8px">
+          <span class="tiny b muted">数据源</span>
+          <span class="badge" id="srcBadge">未载入</span>
+        </div>
+        <div class="tiny dim" id="srcDetail">导入 CSV / Excel / JSON 后，这里会显示工作表、行列规模与类型分布。</div>
+        <div class="meter" style="margin-top:10px"><i id="srcMeter" style="width:0%"></i></div>
+        <div class="row between tiny dim" style="margin-top:5px">
+          <span>数据完整度</span><span id="srcComplete">—</span>
+        </div>
+      </div>
+
+      <div class="side-card" style="margin-top:12px">
+        <div class="row gap-2" style="margin-bottom:6px">
+          <svg class="ic ic-sm" style="color:var(--ok)"><use href="#i-lock" /></svg>
+          <span class="tiny b">隐私优先</span>
+        </div>
+        <div class="tiny dim">全部计算在浏览器本地完成，文件不会被上传到任何服务器。</div>
+      </div>
+    </aside>
+    <!-- ===================== 主内容 ===================== -->
+    <main class="content" id="mainContent" tabindex="-1">
+      <div class="content-inner">
+
+        <!-- ========== 视图：数据接入 ========== -->
+        <section class="view active" id="view-ingest">
+          <div class="view-head">
+            <div class="grow">
+              <h2>数据接入</h2>
+              <p>拖入文件、粘贴表格或载入示例数据，30 秒内得到一份完整的数据画像与可视化报表。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <span class="badge badge-ok"><span class="dot"></span>本地处理</span>
+              <span class="badge badge-brand">支持 100 万+ 单元格</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-b">
+              <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="拖拽或点击选择数据文件">
+                <div class="dz-ic"><svg class="ic" style="width:30px;height:30px;stroke-width:1.6"><use href="#i-upload" /></svg></div>
+                <div class="dz-title">把文件拖到这里，或点击选择文件</div>
+                <div class="dz-sub">首行会被识别为列名，自动推断每列的数据类型（数值 / 日期 / 文本 / 布尔）</div>
+                <div class="dz-formats">
+                  <span class="badge">CSV</span><span class="badge">TSV</span><span class="badge">XLSX</span>
+                  <span class="badge">XLS</span><span class="badge">JSON</span>
+                </div>
+                <div class="hint" style="margin-top:12px">多工作表文件可在导入后切换 · 单个文件建议不超过 50 MB</div>
+              </div>
+
+              <div class="row gap-3 wrap" style="margin-top:16px">
+                <button class="btn" id="btnPaste"><svg class="ic ic-sm"><use href="#i-paste" /></svg>粘贴表格 / JSON</button>
+                <button class="btn" id="btnDemo2"><svg class="ic ic-sm"><use href="#i-zap" /></svg>载入示例数据</button>
+                <button class="btn btn-ghost" id="btnRestore"><svg class="ic ic-sm"><use href="#i-history" /></svg>恢复上次数据</button>
+                <div class="grow"></div>
+                <label class="switch tiny" data-tip="开启后，数据与配置会保存在本机浏览器中，下次打开可一键恢复">
+                  <input type="checkbox" id="optAutosave"><span class="track"></span>自动保存本次会话
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid g-3" style="margin-top:16px">
+            <div class="card"><div class="card-b">
+              <div class="kpi-ic" style="margin-bottom:10px"><svg class="ic"><use href="#i-gauge" /></svg></div>
+              <h3 class="b" style="font-size:14.5px">一键数据画像</h3>
+              <p class="tiny muted" style="margin-top:5px">每列的类型、缺失率、唯一值、极值、均值、中位数、标准差与分布直方图，自动生成。</p>
+            </div></div>
+            <div class="card"><div class="card-b">
+              <div class="kpi-ic" style="margin-bottom:10px"><svg class="ic"><use href="#i-chart" /></svg></div>
+              <h3 class="b" style="font-size:14.5px">12 种图表 + 聚合分析</h3>
+              <p class="tiny muted" style="margin-top:5px">柱状 / 折线 / 面积 / 饼环 / 散点 / 雷达 / 漏斗 / 箱线 / 直方 / 相关性热力图，支持分组聚合与多系列对比。</p>
+            </div></div>
+            <div class="card"><div class="card-b">
+              <div class="kpi-ic" style="margin-bottom:10px"><svg class="ic"><use href="#i-sparkles" /></svg></div>
+              <h3 class="b" style="font-size:14.5px">清洗与透视</h3>
+              <p class="tiny muted" style="margin-top:5px">去空格、去重、缺失值填充、计算列、类型转换，全部可撤销；再按维度交叉透视汇总。</p>
+            </div></div>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <div class="card-h">
+              <h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-history" /></svg>最近导入<span class="sub">仅记录文件名，保存在本机</span></h3>
+              <div class="grow"></div>
+              <button class="btn btn-ghost btn-xs" id="btnClearRecent">清空记录</button>
+            </div>
+            <div class="card-b tight" id="recentList"></div>
+          </div>
+        </section>
+
+        <!-- ========== 视图：数据概览 ========== -->
+        <section class="view" id="view-overview">
+          <div class="view-head">
+            <div class="grow">
+              <h2>数据概览</h2>
+              <p id="ovSubtitle">自动扫描每一列，输出结构、质量与分布洞察。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <button class="btn btn-sm" id="btnReprofile"><svg class="ic ic-sm"><use href="#i-refresh" /></svg>重新分析</button>
+              <button class="btn btn-sm btn-primary" id="btnOvToChart"><svg class="ic ic-sm"><use href="#i-chart" /></svg>去可视化</button>
+            </div>
+          </div>
+
+          <div class="grid g-6" id="kpiGrid"></div>
+
+          <div class="grid g-side" style="margin-top:16px">
+            <div class="card">
+              <div class="card-h">
+                <h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-columns" /></svg>列画像</h3>
+                <span class="sub" id="profCount">—</span>
+                <div class="grow"></div>
+                <div class="seg" id="profSort">
+                  <button data-ps="order" class="on">原顺序</button>
+                  <button data-ps="missing">缺失最多</button>
+                  <button data-ps="unique">唯一值多</button>
+                  <button data-ps="type">按类型</button>
+                </div>
+              </div>
+              <div class="card-b tight" style="padding:0">
+                <div style="max-height:min(60vh,620px);overflow:auto">
+                  <div class="prof-row prof-head">
+                    <span>列名 / 类型</span><span>缺失率</span><span>分布 &amp; 唯一值</span>
+                    <span class="opt-col">最小 / 最大</span><span class="opt-col">均值</span>
+                    <span class="opt-col">中位数</span><span class="opt-col">Top 值</span>
+                  </div>
+                  <div id="profBody"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col gap-3" style="min-width:0">
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--warn)"><use href="#i-alert" /></svg>数据质量提醒</h3>
+                  <div class="grow"></div><span class="badge" id="issueCount">0</span></div>
+                <div class="card-b tight" id="issueList" style="max-height:330px;overflow:auto"></div>
+              </div>
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--info)"><use href="#i-activity" /></svg>数值列速览</h3></div>
+                <div class="card-b tight" id="numQuick" style="max-height:300px;overflow:auto"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- ========== 视图：数据表 ========== -->
+        <section class="view" id="view-table">
+          <div class="view-head">
+            <div class="grow">
+              <h2>数据表</h2>
+              <p id="tblSubtitle">点击表头排序，双击单元格可直接编辑，右键打开更多操作。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <button class="btn btn-sm btn-danger hidden" id="btnDelSel">
+                <svg class="ic ic-sm"><use href="#i-trash" /></svg>删除所选 <span id="selCount" class="badge">0</span>
+              </button>
+              <button class="btn btn-sm" id="btnCols"><svg class="ic ic-sm"><use href="#i-columns" /></svg>显示列</button>
+              <div class="seg" id="tblDensity" role="group" aria-label="行高">
+                <button data-d="compact" data-tip="紧凑">紧凑</button>
+                <button data-d="normal" class="on" data-tip="标准">标准</button>
+                <button data-d="cozy" data-tip="宽松">宽松</button>
+              </div>
+              <button class="btn btn-sm" id="btnExportTbl"><svg class="ic ic-sm"><use href="#i-download" /></svg>导出</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h">
+              <div class="search-wrap" style="max-width:320px">
+                <svg class="ic ic-sm"><use href="#i-search" /></svg>
+                <input class="input" id="tblSearch" type="search" placeholder="全表搜索（支持多关键词，空格分隔）" aria-label="搜索数据">
+                <button class="search-clear hidden" id="btnSearchClear" aria-label="清空搜索"><svg class="ic ic-sm"><use href="#i-x" /></svg></button>
+              </div>
+              <button class="btn btn-sm" id="btnAddFilter"><svg class="ic ic-sm"><use href="#i-filter" /></svg>添加筛选</button>
+              <div class="row gap-2 wrap" id="filterChips"></div>
+              <div class="grow"></div>
+              <span class="tiny dim" id="tblCount">—</span>
+            </div>
+
+            <div id="tblEmpty"></div>
+            <div id="tblWrap" class="tbl-scroll" style="border:0;border-radius:0">
+              <table class="tbl" id="tbl">
+                <thead id="tblHead"></thead>
+                <tbody id="tblBody"></tbody>
+              </table>
+            </div>
+
+            <div class="card-f row between wrap gap-3">
+              <div class="row gap-3 wrap tiny muted">
+                <span id="tblRange">显示 0-0 / 共 0 行</span>
+                <label class="row gap-2">每页
+                  <select class="select input-sm" id="pageSize" style="width:auto">
+                    <option value="10">10</option><option value="25" selected>25</option>
+                    <option value="50">50</option><option value="100">100</option>
+                    <option value="500">500</option><option value="0">全部</option>
+                  </select> 行
+                </label>
+                <label class="row gap-2">跳转到
+                  <input class="input input-sm" id="pageJump" type="number" min="1" value="1" style="width:66px">
+                </label>
+              </div>
+              <div class="pager" id="pager"></div>
+            </div>
+          </div>
+          <div class="hint" style="margin-top:9px">
+            <span class="kbd">/</span> 聚焦搜索 · <span class="kbd">Ctrl</span>+<span class="kbd">F</span> 快速搜索 ·
+            双击单元格编辑（<span class="kbd">Enter</span> 保存 / <span class="kbd">Esc</span> 取消）·
+            <span class="kbd">Ctrl</span>+<span class="kbd">Z</span> 撤销上一步清洗
+          </div>
+        </section>
+
+        <!-- ========== 视图：可视化 ========== -->
+        <section class="view" id="view-charts">
+          <div class="view-head">
+            <div class="grow">
+              <h2>可视化</h2>
+              <p id="chartSubtitle">选择维度与指标，自动完成分组聚合；可固定多张图表用于报告。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <button class="btn btn-sm" id="btnChartAuto"><svg class="ic ic-sm"><use href="#i-wand" /></svg>智能推荐</button>
+              <button class="btn btn-sm" id="btnChartReset"><svg class="ic ic-sm"><use href="#i-refresh" /></svg>重置配置</button>
+            </div>
+          </div>
+
+          <div class="grid g-side-l">
+            <!-- 配置面板 -->
+            <div class="card" style="align-self:start;position:sticky;top:calc(var(--top-h) + 16px)">
+              <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-sliders" /></svg>图表配置</h3></div>
+              <div class="card-b col gap-4" style="max-height:min(74vh,860px);overflow:auto">
+                <div class="field">
+                  <label>图表类型</label>
+                  <div class="grid g-3" id="chartTypeGrid" style="gap:7px"></div>
+                </div>
+
+                <div class="field">
+                  <label>数据模式
+                    <span class="badge badge-brand" id="modeBadge">聚合</span>
+                  </label>
+                  <div class="seg" id="chartMode" style="width:100%">
+                    <button data-m="agg" class="on grow center">按维度聚合</button>
+                    <button data-m="raw" class="grow center">逐行明细</button>
+                  </div>
+                  <span class="hint" id="modeHint">把相同维度的行合并后再统计，适合分类汇总。</span>
+                </div>
+
+                <div class="field">
+                  <label for="cfgX">维度 / X 轴</label>
+                  <select class="select" id="cfgX"></select>
+                </div>
+
+                <div class="field" id="wrapSplit">
+                  <label for="cfgSplit">系列拆分（可选）
+                    <span class="hint">按该列把数据拆成多个系列对比</span>
+                  </label>
+                  <select class="select" id="cfgSplit"></select>
+                </div>
+
+                <div class="field">
+                  <label>指标 / Y 轴 <span class="hint" id="yHint">可多选</span></label>
+                  <div id="yList" class="col gap-1" style="max-height:186px;overflow:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:7px;background:var(--elev-2)"></div>
+                </div>
+
+                <div class="field" id="wrapAgg">
+                  <label for="cfgAgg">聚合方式</label>
+                  <select class="select" id="cfgAgg">
+                    <option value="sum">求和 Sum</option>
+                    <option value="avg">平均值 Avg</option>
+                    <option value="count">计数 Count</option>
+                    <option value="countAll">行数（含空值）</option>
+                    <option value="min">最小值 Min</option>
+                    <option value="max">最大值 Max</option>
+                    <option value="median">中位数 Median</option>
+                    <option value="distinct">去重计数</option>
+                  </select>
+                </div>
+
+                <div class="grid g-2">
+                  <div class="field" id="wrapTopN">
+                    <label for="cfgTopN">显示前 N 项</label>
+                    <select class="select" id="cfgTopN">
+                      <option value="10">10</option><option value="15">15</option>
+                      <option value="20" selected>20</option><option value="30">30</option>
+                      <option value="50">50</option><option value="0">全部</option>
+                    </select>
+                  </div>
+                  <div class="field" id="wrapSortBy">
+                    <label for="cfgSortBy">排序</label>
+                    <select class="select" id="cfgSortBy">
+                      <option value="desc">数值 高→低</option>
+                      <option value="asc">数值 低→高</option>
+                      <option value="xasc" selected>维度 原顺序</option>
+                      <option value="xdesc">维度 倒序</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field" id="wrapBin">
+                  <label for="cfgBin">直方图分组数</label>
+                  <input class="input" id="cfgBin" type="range" min="4" max="40" value="14">
+                  <span class="hint">当前 <b id="cfgBinVal">14</b> 组 · 留空则按 Sturges 公式自动</span>
+                </div>
+
+                <div class="field">
+                  <label>样式选项</label>
+                  <div class="col gap-2">
+                    <label class="switch tiny"><input type="checkbox" id="cfgSmooth" checked><span class="track"></span>平滑曲线 / 圆角柱</label>
+                    <label class="switch tiny"><input type="checkbox" id="cfgStack"><span class="track"></span>堆叠显示</label>
+                    <label class="switch tiny"><input type="checkbox" id="cfgLabel"><span class="track"></span>显示数值标签</label>
+                    <label class="switch tiny"><input type="checkbox" id="cfgRotate" checked><span class="track"></span>X 轴标签倾斜</label>
+                    <label class="switch tiny"><input type="checkbox" id="cfgDataZoom"><span class="track"></span>底部缩放滑块</label>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>配色方案</label>
+                  <div class="swatches" id="paletteList"></div>
+                </div>
+
+                <div class="field">
+                  <label for="cfgTitle">图表标题</label>
+                  <input class="input" id="cfgTitle" placeholder="留空则自动生成">
+                </div>
+              </div>
+              <div class="card-f row gap-2">
+                <button class="btn btn-primary btn-sm grow" id="btnRenderChart"><svg class="ic ic-sm"><use href="#i-chart" /></svg>生成图表</button>
+                <button class="btn btn-sm" id="btnSaveChart" data-tip="固定到下方图库并加入报告"><svg class="ic ic-sm"><use href="#i-pin" /></svg>固定</button>
+              </div>
+            </div>
+
+            <!-- 图表区 -->
+            <div class="col gap-3" style="min-width:0">
+              <div class="card">
+                <div class="card-h">
+                  <h3 id="chartTitle" class="truncate">图表预览</h3>
+                  <div class="grow"></div>
+                  <button class="btn btn-ghost btn-icon btn-sm" id="btnChartFull" aria-label="全屏" data-tip="全屏"><svg class="ic ic-sm"><use href="#i-expand" /></svg></button>
+                  <button class="btn btn-ghost btn-icon btn-sm" id="btnChartPng" aria-label="下载图片" data-tip="下载 PNG"><svg class="ic ic-sm"><use href="#i-download" /></svg></button>
+                  <button class="btn btn-ghost btn-icon btn-sm" id="btnChartJson" aria-label="复制配置" data-tip="复制 ECharts 配置 JSON"><svg class="ic ic-sm"><use href="#i-braces" /></svg></button>
+                </div>
+                <div class="card-b tight">
+                  <div class="chart-holder">
+                    <div id="chartBox" class="chart-box"></div>
+                    <div id="chartEmpty"></div>
+                  </div>
+                </div>
+                <div class="card-f row between wrap gap-2 tiny dim" id="chartFoot">尚未生成图表</div>
+              </div>
+
+              <div class="card">
+                <div class="card-h">
+                  <h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-pin" /></svg>已固定图表</h3>
+                  <span class="sub">固定后可一键加入报告</span>
+                  <div class="grow"></div>
+                  <span class="badge" id="savedCount">0</span>
+                  <button class="btn btn-ghost btn-xs" id="btnClearSaved">全部清除</button>
+                </div>
+                <div class="card-b" id="savedGrid"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- ========== 视图：透视分析 ========== -->
+        <section class="view" id="view-pivot">
+          <div class="view-head">
+            <div class="grow">
+              <h2>透视分析</h2>
+              <p>像 Excel 数据透视表一样，按维度交叉汇总指标，支持多级行维度与小计。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <button class="btn btn-sm" id="btnPivotCopy"><svg class="ic ic-sm"><use href="#i-copy" /></svg>复制结果</button>
+              <button class="btn btn-sm" id="btnPivotExport"><svg class="ic ic-sm"><use href="#i-download" /></svg>导出</button>
+            </div>
+          </div>
+
+          <div class="grid g-side-l">
+            <div class="card" style="align-self:start;position:sticky;top:calc(var(--top-h) + 16px)">
+              <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-grid" /></svg>透视配置</h3></div>
+              <div class="card-b col gap-4">
+                <div class="field">
+                  <label>行维度 <span class="hint">可多选，按选择顺序形成层级</span></label>
+                  <div id="pvRowList" class="col gap-1" style="max-height:170px;overflow:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:7px;background:var(--elev-2)"></div>
+                </div>
+                <div class="field">
+                  <label for="pvCol">列维度（可选）</label>
+                  <select class="select" id="pvCol"></select>
+                </div>
+                <div class="field">
+                  <label for="pvVal">值字段</label>
+                  <select class="select" id="pvVal"></select>
+                </div>
+                <div class="field">
+                  <label for="pvAgg">聚合方式</label>
+                  <select class="select" id="pvAgg">
+                    <option value="sum">求和 Sum</option><option value="avg">平均值 Avg</option>
+                    <option value="count">计数 Count</option><option value="countAll">行数（含空值）</option>
+                    <option value="min">最小值 Min</option><option value="max">最大值 Max</option>
+                    <option value="median">中位数 Median</option><option value="distinct">去重计数</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>显示选项</label>
+                  <div class="col gap-2">
+                    <label class="switch tiny"><input type="checkbox" id="pvTotals" checked><span class="track"></span>显示总计行 / 列</label>
+                    <label class="switch tiny"><input type="checkbox" id="pvHeat" checked><span class="track"></span>按数值热力着色</label>
+                    <label class="switch tiny"><input type="checkbox" id="pvPercent"><span class="track"></span>显示占总计百分比</label>
+                    <label class="switch tiny"><input type="checkbox" id="pvSortDesc" checked><span class="track"></span>按总计降序排列</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>数据来源</label>
+                  <div class="seg" id="pvScope" style="width:100%">
+                    <button data-s="filtered" class="on grow center">当前筛选结果</button>
+                    <button data-s="all" class="grow center">全部数据</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-f">
+                <button class="btn btn-primary btn-sm btn-block" id="btnPivotRun"><svg class="ic ic-sm"><use href="#i-grid" /></svg>生成透视表</button>
+              </div>
+            </div>
+
+            <div class="card" style="min-width:0">
+              <div class="card-h">
+                <h3 id="pvTitle">透视结果</h3>
+                <div class="grow"></div>
+                <span class="badge" id="pvInfo">—</span>
+              </div>
+              <div class="card-b tight">
+                <div id="pvEmpty"></div>
+                <div id="pvWrap" class="tbl-scroll" style="max-height:min(72vh,820px);border:0"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== 视图：数据清洗 ========== -->
+        <section class="view" id="view-clean">
+          <div class="view-head">
+            <div class="grow">
+              <h2>数据清洗</h2>
+              <p>每一步操作都会记录，可随时撤销；操作仅影响当前会话的数据副本。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <button class="btn btn-sm" id="btnUndo"><svg class="ic ic-sm"><use href="#i-undo" /></svg>撤销 <span class="kbd">Ctrl Z</span></button>
+              <button class="btn btn-sm btn-danger" id="btnResetData"><svg class="ic ic-sm"><use href="#i-refresh" /></svg>恢复原始数据</button>
+            </div>
+          </div>
+
+          <div class="grid g-side">
+            <div class="col gap-3" style="min-width:0">
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-rows" /></svg>行操作</h3>
+                  <div class="grow"></div><span class="badge" id="cleanRowInfo">—</span></div>
+                <div class="card-b row gap-2 wrap">
+                  <button class="btn btn-sm" data-act="dropEmptyRows"><svg class="ic ic-sm"><use href="#i-eraser" /></svg>删除完全空行</button>
+                  <button class="btn btn-sm" data-act="dropDupRows"><svg class="ic ic-sm"><use href="#i-copy" /></svg>删除重复行</button>
+                  <button class="btn btn-sm" data-act="dropRowsMissingAny"><svg class="ic ic-sm"><use href="#i-alert" /></svg>删除含缺失值的行</button>
+                  <button class="btn btn-sm" data-act="trimAll"><svg class="ic ic-sm"><use href="#i-scissors" /></svg>去除所有文本首尾空格</button>
+                  <button class="btn btn-sm" data-act="collapseSpace"><svg class="ic ic-sm"><use href="#i-minus" /></svg>合并多余空白字符</button>
+                  <button class="btn btn-sm" data-act="shuffle"><svg class="ic ic-sm"><use href="#i-refresh" /></svg>随机打乱行序</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--warn)"><use href="#i-target" /></svg>缺失值处理</h3></div>
+                <div class="card-b">
+                  <div class="grid g-3">
+                    <div class="field"><label for="fillCol">选择列</label><select class="select" id="fillCol"></select></div>
+                    <div class="field"><label for="fillMode">填充方式</label>
+                      <select class="select" id="fillMode">
+                        <option value="zero">填 0</option><option value="mean">填均值（数值列）</option>
+                        <option value="median">填中位数（数值列）</option><option value="mode">填众数</option>
+                        <option value="ffill">用上一行的值</option><option value="text">填指定文本…</option>
+                        <option value="drop">删除该列为空的行</option>
+                      </select>
+                    </div>
+                    <div class="field"><label for="fillText">指定文本（可选）</label><input class="input" id="fillText" placeholder="例如：未知"></div>
+                  </div>
+                  <div class="row gap-2" style="margin-top:12px">
+                    <button class="btn btn-primary btn-sm" id="btnFill"><svg class="ic ic-sm"><use href="#i-wand" /></svg>应用到该列</button>
+                    <button class="btn btn-sm" id="btnFillAllNumeric"><svg class="ic ic-sm"><use href="#i-layers" /></svg>所有数值列填 0</button>
+                    <span class="hint" id="fillPreview"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--info)"><use href="#i-columns" /></svg>列操作</h3></div>
+                <div class="card-b">
+                  <div class="grid g-2">
+                    <div class="field"><label for="colOp">选择列</label><select class="select" id="colOp"></select></div>
+                    <div class="field"><label>&nbsp;</label>
+                      <div class="row gap-2 wrap">
+                        <button class="btn btn-sm" id="btnRenameCol"><svg class="ic ic-sm"><use href="#i-pencil" /></svg>重命名</button>
+                        <button class="btn btn-sm" id="btnTypeNum">转数值</button>
+                        <button class="btn btn-sm" id="btnTypeDate">转日期</button>
+                        <button class="btn btn-sm" id="btnTypeText">转文本</button>
+                        <button class="btn btn-sm btn-danger" id="btnDropCol"><svg class="ic ic-sm"><use href="#i-trash" /></svg>删除列</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid g-2" style="margin-top:14px">
+                    <div class="field">
+                      <label for="splitCol">按分隔符拆分列</label>
+                      <div class="row gap-2">
+                        <select class="select" id="splitCol"></select>
+                        <input class="input" id="splitSep" value="-" style="width:76px" placeholder="分隔符" aria-label="分隔符">
+                        <button class="btn btn-sm" id="btnSplit">拆分</button>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="dedupeCol">按某列去重（保留首行）</label>
+                      <div class="row gap-2">
+                        <select class="select" id="dedupeCol"></select>
+                        <button class="btn btn-sm" id="btnDedupe">去重</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-h">
+                  <h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-fx" /></svg>新增计算列</h3>
+                  <span class="sub">用表达式基于现有列生成新列</span>
+                </div>
+                <div class="card-b">
+                  <div class="grid g-2">
+                    <div class="field"><label for="calcName">新列名</label><input class="input" id="calcName" placeholder="例如：销售额"></div>
+                    <div class="field"><label for="calcExpr">表达式</label><input class="input mono" id="calcExpr" placeholder="例如：[单价] * [数量] * (1 - [折扣])"></div>
+                  </div>
+                  <div class="row gap-2 wrap" style="margin-top:12px">
+                    <button class="btn btn-primary btn-sm" id="btnCalcPreview"><svg class="ic ic-sm"><use href="#i-eye" /></svg>预览前 5 行</button>
+                    <button class="btn btn-sm" id="btnCalcApply"><svg class="ic ic-sm"><use href="#i-plus" /></svg>添加该列</button>
+                    <button class="btn btn-ghost btn-sm" id="btnCalcHelp"><svg class="ic ic-sm"><use href="#i-help" /></svg>语法说明</button>
+                  </div>
+                  <div id="calcPreview" class="tiny mono" style="margin-top:10px"></div>
+                  <div class="row gap-2 wrap" style="margin-top:10px" id="calcQuick"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col gap-3" style="min-width:0">
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-history" /></svg>操作历史</h3>
+                  <div class="grow"></div><span class="badge" id="histCount">0</span></div>
+                <div class="card-b tight" id="histList" style="max-height:min(46vh,420px);overflow:auto"></div>
+              </div>
+              <div class="card">
+                <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--ok)"><use href="#i-shield" /></svg>清洗前后对比</h3></div>
+                <div class="card-b" id="cleanDiff"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== 视图：报告导出 ========== -->
+        <section class="view" id="view-report">
+          <div class="view-head no-print">
+            <div class="grow">
+              <h2>报告导出</h2>
+              <p>把概览、图表与数据样本组合成一份可直接打印或分享的报告。</p>
+            </div>
+            <div class="row gap-2 wrap">
+              <button class="btn btn-sm" id="btnReportRefresh"><svg class="ic ic-sm"><use href="#i-refresh" /></svg>刷新预览</button>
+              <button class="btn btn-sm" id="btnPrint"><svg class="ic ic-sm"><use href="#i-print" /></svg>打印 / 存为 PDF</button>
+              <button class="btn btn-primary btn-sm" id="btnExportHtml"><svg class="ic ic-sm"><use href="#i-save" /></svg>下载 HTML 报告</button>
+            </div>
+          </div>
+
+          <div class="grid g-side-l no-print">
+            <div class="card no-print" style="align-self:start">
+              <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-sliders" /></svg>报告设置</h3></div>
+              <div class="card-b col gap-4">
+                <div class="field"><label for="rpTitle">报告标题</label><input class="input" id="rpTitle" placeholder="数据分析报告"></div>
+                <div class="field"><label for="rpAuthor">作者 / 部门</label><input class="input" id="rpAuthor" placeholder="可选"></div>
+                <div class="field"><label for="rpSummary">摘要说明</label><textarea class="input" id="rpSummary" rows="3" placeholder="可选，将显示在报告开头"></textarea></div>
+                <div class="field">
+                  <label>包含模块</label>
+                  <div class="col gap-2">
+                    <label class="switch tiny"><input type="checkbox" id="rpIncKpi" checked><span class="track"></span>关键指标</label>
+                    <label class="switch tiny"><input type="checkbox" id="rpIncProfile" checked><span class="track"></span>列画像摘要</label>
+                    <label class="switch tiny"><input type="checkbox" id="rpIncIssues" checked><span class="track"></span>数据质量提醒</label>
+                    <label class="switch tiny"><input type="checkbox" id="rpIncCharts" checked><span class="track"></span>已固定的图表</label>
+                    <label class="switch tiny"><input type="checkbox" id="rpIncPivot"><span class="track"></span>透视表结果</label>
+                    <label class="switch tiny"><input type="checkbox" id="rpIncSample" checked><span class="track"></span>数据样本</label>
+                  </div>
+                </div>
+                <div class="field" id="rpSampleWrap">
+                  <label for="rpSampleRows">样本行数</label>
+                  <select class="select" id="rpSampleRows">
+                    <option value="10">10</option><option value="25" selected>25</option>
+                    <option value="50">50</option><option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="min-width:0">
+              <div class="card-h no-print"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-eye" /></svg>预览</h3>
+                <div class="grow"></div><span class="hint">打印时只会输出下方报告内容</span></div>
+              <div class="card-b" style="background:var(--soft)">
+                <div id="reportPreview"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="reportPrintArea" class="hidden"></div>
+
+          <div class="card no-print" style="margin-top:16px">
+            <div class="card-h"><h3><svg class="ic ic-sm" style="color:var(--brand)"><use href="#i-download" /></svg>导出原始 / 处理后数据</h3></div>
+            <div class="card-b row gap-2 wrap">
+              <button class="btn btn-sm" data-exp="csv"><svg class="ic ic-sm"><use href="#i-file" /></svg>CSV（当前筛选）</button>
+              <button class="btn btn-sm" data-exp="csv-all"><svg class="ic ic-sm"><use href="#i-file" /></svg>CSV（全部）</button>
+              <button class="btn btn-sm" data-exp="xlsx"><svg class="ic ic-sm"><use href="#i-table" /></svg>Excel XLSX</button>
+              <button class="btn btn-sm" data-exp="json"><svg class="ic ic-sm"><use href="#i-braces" /></svg>JSON</button>
+              <div class="grow"></div>
+              <span class="hint">导出文件包含你在「数据清洗」中所做的全部修改</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== 覆盖层 ===================== -->
+  <div id="popRoot"></div>
+  <div id="modalRoot"></div>
+  <div id="drawerRoot"></div>
+  <div id="cmdkRoot"></div>
+  <div id="toasts" aria-live="polite" aria-atomic="false"></div>
+  <input type="file" id="fileInput" class="hidden" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm,.json" multiple>
+
+  <footer class="no-print" style="border-top:1px solid var(--border);padding:16px 22px;text-align:center;color:var(--text-3);font-size:12px;background:color-mix(in srgb, var(--elev) 55%, transparent)">
+    DataLens Pro · 本地优先数据工作台 · 数据不出本机 ·
+    <a href="#" id="linkHelp">快捷键</a> · <a href="#" id="linkAbout">关于</a>
+  </footer>
+  
+
+  <!-- ===================== 第三方库加载（多 CDN 容错） ===================== -->
+  
+  <!-- ===================== 主程序 ===================== -->
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script src="src/app.js"></script>
+</body>
+
+</html>
+
